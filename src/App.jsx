@@ -8,6 +8,8 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+  const [notification, setNotification] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
   const [newBlog, setNewBlog] = useState({
     title: '',
     author: '',
@@ -42,10 +44,10 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      // setErrorMessage('Wrong credentials')
-      // setTimeout(() => {
-      //   setErrorMessage(null)
-      // }, 5000)
+      setErrorMessage('wrong username or password')
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
     }
   }
 
@@ -58,9 +60,18 @@ const App = () => {
     event.preventDefault()
     try {
       const response = await blogService.create(newBlog)
+      setNotification(`${newBlog.title} by ${newBlog.author} added`)
+      setTimeout(() => {
+        setNotification(null)
+      }, 5000)
       setBlogs(blogs.concat(response))
       setNewBlog({title: '', author: '', url: ''})
-    } catch (exception) {}
+    } catch (exception) {
+        setErrorMessage(exception.response?.data?.error || 'error occurred adding blog')
+        setTimeout(() => {
+          setErrorMessage(null)
+      }, 5000)
+    }
   }
 
   const handleLogout = (event) => {
@@ -127,6 +138,8 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
+      {notification && <div class="notification">{notification}</div>}
+      {errorMessage && <div class="error">{errorMessage}</div>}
       {user === null && loginForm()}
       {user !== null && userInfo()}
       {user !== null && blogForm()}
