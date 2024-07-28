@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import LoginForm from './components/LoginForm'
+import Togglable from './components/Togglable'
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -81,30 +84,6 @@ const App = () => {
     blogService.setToken(null)
   }
 
-  const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <div>
-        username
-          <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        password
-          <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>      
-  )
-
   const userInfo = () => (
     <div>
       <p>
@@ -114,30 +93,34 @@ const App = () => {
     </div>
   )
 
-  const blogForm = () => (
-    <div>
-      <h2>create new</h2>
-      <form onSubmit={addBlog}>
-        <div>
-          title:
-          <input type ="text" value={newBlog.title} name="title" onChange={handleBlogChange}/>
-        </div>
-        <div>
-          author:
-          <input type ="text" value={newBlog.author} name="author" onChange={handleBlogChange}/>
-        </div>
-        <div>
-          url:
-          <input type ="text" value={newBlog.url} name="url" onChange={handleBlogChange}/>
-        </div>
-        <button type="submit">create</button>
-      </form>
-    </div>
+  const loginForm = () => (
+    <Togglable buttonLabel='login'>
+      <LoginForm
+        username={username}
+        password={password}
+        handleUsernameChange={({ target }) => setUsername(target.value)}
+        handlePasswordChange={({ target }) => setPassword(target.value)}
+        handleSubmit={handleLogin}
+      />
+    </Togglable>
   )
+
+  const blogForm = () => (
+    <Togglable buttonLabel='create new'>
+      <BlogForm
+        title={newBlog.title}
+        author={newBlog.author}
+        url={newBlog.url}
+        handleBlogChange={handleBlogChange}
+        handleAddBlog={addBlog}
+      />
+    </Togglable>
+  )
+
 
   return (
     <div>
-      <h2>blogs</h2>
+      <h1>blogs</h1>
       {notification && <div class="notification">{notification}</div>}
       {errorMessage && <div class="error">{errorMessage}</div>}
       {user === null && loginForm()}
