@@ -13,11 +13,6 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
-  const [newBlog, setNewBlog] = useState({
-    title: '',
-    author: '',
-    url: ''
-  });
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -54,21 +49,14 @@ const App = () => {
     }
   }
 
-  const handleBlogChange = (event) => {
-    const {name, value} = event.target
-    setNewBlog({ ...newBlog, [name]: value })
-  }
-
-  const addBlog = async (event) => {
-    event.preventDefault()
+  const addBlog = async (blogObject) => {
     try {
-      const response = await blogService.create(newBlog)
-      setNotification(`${newBlog.title} by ${newBlog.author} added`)
+      const response = await blogService.create(blogObject)
+      setNotification(`${blogObject.title} by ${blogObject.author} added`)
       setTimeout(() => {
         setNotification(null)
       }, 5000)
       setBlogs(blogs.concat(response))
-      setNewBlog({title: '', author: '', url: ''})
     } catch (exception) {
         setErrorMessage(exception.response?.data?.error || 'error occurred adding blog')
         setTimeout(() => {
@@ -107,22 +95,15 @@ const App = () => {
 
   const blogForm = () => (
     <Togglable buttonLabel='create new'>
-      <BlogForm
-        title={newBlog.title}
-        author={newBlog.author}
-        url={newBlog.url}
-        handleBlogChange={handleBlogChange}
-        handleAddBlog={addBlog}
-      />
+      <BlogForm createBlog={addBlog}/>
     </Togglable>
   )
-
 
   return (
     <div>
       <h1>blogs</h1>
-      {notification && <div class="notification">{notification}</div>}
-      {errorMessage && <div class="error">{errorMessage}</div>}
+      {notification && <div className="notification">{notification}</div>}
+      {errorMessage && <div className="error">{errorMessage}</div>}
       {user === null && loginForm()}
       {user !== null && userInfo()}
       {user !== null && blogForm()}
