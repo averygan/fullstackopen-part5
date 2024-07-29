@@ -1,8 +1,7 @@
 import { useState } from 'react'
-import likeService from '../services/like'
 import blogService from '../services/blogs'
 
-const Blog = ({ blog, setNotification, blogState, setBlogs, compareLikes}) => {
+const Blog = ({ blog, setNotification, setError, blogState, setBlogs, compareLikes, loggedInUser}) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -10,6 +9,40 @@ const Blog = ({ blog, setNotification, blogState, setBlogs, compareLikes}) => {
     borderWidth: 1,
     marginBottom: 5
   }
+
+  const [visible, setVisible] = useState(false)
+
+  const hideWhenVisible = { display: visible ? 'none' : '' }
+  const showWhenVisible = { display: visible ? '' : 'none' }
+
+  const deleteBlog = async (blogObject) => {
+    if (!loggedInUser.username) {
+      return alert("Login required to delete blogs")
+    }
+    if (blogObject.user.username === loggedInUser.username) {
+      if (confirm(`Remove ${blogObject.title}?`)) {
+        const response = await blogService.deleteBlog(blogObject.id)
+        // successful deletion returns no response body
+        if (!response) {
+          setBlogs(blogState.filter(blog => blog.id !== blogObject.id))
+          setNotification(`"${blogObject.title}" deleted successfully`)
+          setTimeout(() => {
+            setNotification(null)
+          }, 5000)
+        } else {
+          setError(`failed to delete "${blogObject.title}"`)
+          setTimeout(() => {
+            setError(null)
+          }, 5000)
+        }
+      }
+      return ;
+    }
+    setError(`not authorized to delete "${blogObject.title}"`)
+    setTimeout(() => {
+      setError(null)
+    }, 5000)
+}
 
   const handleLike = async (id) => {
     try {
@@ -29,7 +62,7 @@ const Blog = ({ blog, setNotification, blogState, setBlogs, compareLikes}) => {
       // destructure id and user from blogobject, add the rest to updatedBlog
       const {id, user, ...updatedBlog} = blogObject
       updatedBlog.likes = updatedBlog.likes + 1
-      const response = await likeService.like(id, updatedBlog)
+      const response = await blogService.like(id, updatedBlog)
       handleLike(id)
       setNotification(`like added to "${blogObject.title}"`)
       setTimeout(() => {
@@ -42,11 +75,6 @@ const Blog = ({ blog, setNotification, blogState, setBlogs, compareLikes}) => {
       }, 5000)
     }
   }
-
-  const [visible, setVisible] = useState(false)
-
-  const hideWhenVisible = { display: visible ? 'none' : '' }
-  const showWhenVisible = { display: visible ? '' : 'none' }
 
     const toggleVisibility = () => {
         setVisible(!visible)
@@ -65,6 +93,13 @@ const Blog = ({ blog, setNotification, blogState, setBlogs, compareLikes}) => {
         <div>URL: {blog.url}</div>
         <div>likes: {blog.likes} <button onClick={() => addLike(blog)}>like</button></div>
         <div>User: {blog.user.name}</div>
+        <div>
+          {loggedInUser && (
+            <button onClick={() => deleteBlog(blog)}>
+            delete
+          </button>
+          )}
+        </div>
       </div>
     </div>
   )

@@ -44,6 +44,7 @@ const App = () => {
         username, password,
       })
       window.localStorage.setItem('loggedUser', JSON.stringify(user))
+      blogService.setUsername(user.username)
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
@@ -121,9 +122,11 @@ const App = () => {
           key={blog.id} 
           blog={blog} 
           setNotification={setNotification} 
+          setError={setErrorMessage}
           blogState={blogs} 
           setBlogs={setBlogs}
           compareLikes={compareLikes}
+          loggedInUser={user}
         />
       )}
     </div>
