@@ -16,10 +16,15 @@ const App = () => {
 
   const blogFormRef = useRef()
 
+  const compareLikes = (a, b) => {
+    return b.likes - a.likes
+  }
+
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )  
+    blogService.getAll().then(blogs => {
+      const sortedBlogs = [...blogs].sort(compareLikes)
+      setBlogs( sortedBlogs )
+    })  
   }, [])
 
   useEffect(() => {
@@ -112,7 +117,14 @@ const App = () => {
       {user !== null && blogForm()}
     
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} setNotification={setNotification} blogState={blogs} setBlogs={setBlogs}/>
+        <Blog 
+          key={blog.id} 
+          blog={blog} 
+          setNotification={setNotification} 
+          blogState={blogs} 
+          setBlogs={setBlogs}
+          compareLikes={compareLikes}
+        />
       )}
     </div>
   )

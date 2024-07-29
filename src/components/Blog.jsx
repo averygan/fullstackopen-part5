@@ -2,7 +2,7 @@ import { useState } from 'react'
 import likeService from '../services/like'
 import blogService from '../services/blogs'
 
-const Blog = ({ blog, setNotification, blogState, setBlogs}) => {
+const Blog = ({ blog, setNotification, blogState, setBlogs, compareLikes}) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -14,9 +14,12 @@ const Blog = ({ blog, setNotification, blogState, setBlogs}) => {
   const handleLike = async (id) => {
     try {
       const allBlogs = await blogService.getAll()
-      const updated = allBlogs.find(blog => blog.id === id)
-      if (updated)
-        setBlogs(blogState.map(blog => blog.id === id ? updated : blog))
+      const updatedBlog = allBlogs.find(blog => blog.id === id)
+      if (updatedBlog) {
+        const updatedBlogs = blogState.map(blog => blog.id === id ? updatedBlog : blog)
+        const sortedBlogs = [...updatedBlogs].sort(compareLikes);
+        setBlogs(sortedBlogs);
+      }
     } catch (error)
     {}
   }
