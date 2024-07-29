@@ -24,7 +24,7 @@ const App = () => {
     blogService.getAll().then(blogs => {
       const sortedBlogs = [...blogs].sort(compareLikes)
       setBlogs( sortedBlogs )
-    })  
+    })
   }, [])
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    
+
     try {
       const user = await loginService.login({
         username, password,
@@ -67,9 +67,9 @@ const App = () => {
       }, 5000)
       setBlogs(blogs.concat(response))
     } catch (exception) {
-        setErrorMessage(exception.response?.data?.error || 'error occurred adding blog')
-        setTimeout(() => {
-          setErrorMessage(null)
+      setErrorMessage(exception.response?.data?.error || 'error occurred adding blog')
+      setTimeout(() => {
+        setErrorMessage(null)
       }, 5000)
     }
   }
@@ -84,7 +84,7 @@ const App = () => {
   const userInfo = () => (
     <div>
       <p>
-        {user.name} logged in 
+        {user.name} logged in
         <button onClick={handleLogout}>logout</button>
       </p>
     </div>
@@ -116,14 +116,14 @@ const App = () => {
       {user === null && loginForm()}
       {user !== null && userInfo()}
       {user !== null && blogForm()}
-    
+
       {blogs.map(blog =>
-        <Blog 
-          key={blog.id} 
-          blog={blog} 
-          setNotification={setNotification} 
+        <Blog
+          key={blog.id}
+          blog={blog}
+          setNotification={setNotification}
           setError={setErrorMessage}
-          blogState={blogs} 
+          blogState={blogs}
           setBlogs={setBlogs}
           compareLikes={compareLikes}
           loggedInUser={user}
