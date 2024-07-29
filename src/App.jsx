@@ -112,7 +112,7 @@ const App = () => {
       {user !== null && blogForm()}
     
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} setNotification={setNotification} blogState={blogs} setBlogs={setBlogs}/>
       )}
     </div>
   )
