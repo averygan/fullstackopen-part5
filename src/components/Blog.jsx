@@ -82,17 +82,19 @@ const Blog = ({ blog, setNotification, setError, blogState, setBlogs, compareLik
   }
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className='bloglist'>
       {/* when not visible -> show title and view button */}
       <div style={hideWhenVisible}>
-        {blog.title} <button onClick={toggleVisibility}>view</button>
+        <span>{blog.title} </span>
+        <span>{blog.author}</span>
+        <button onClick={toggleVisibility}>view</button>
       </div>
 
       {/* when visible -> show details and hide button */}
-      <div style={showWhenVisible}>
+      <div style={showWhenVisible} className="togglableContent">
         {blog.title} {blog.author} <button onClick={toggleVisibility}>hide</button>
         <div>URL: {blog.url}</div>
-        <div>likes: {blog.likes} <button onClick={() => addLike(blog)}>like</button></div>
+        <div>Likes: {blog.likes} <button onClick={() => addLike(blog)}>like</button></div>
         <div>User: {blog.user.name}</div>
         <div>
           {loggedInUser && (
