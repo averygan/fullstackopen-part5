@@ -55,3 +55,35 @@ describe('blog component', () => {
     expect(likes).toBeDefined()
   })
 })
+
+describe('blog component with mock handler', () => {
+  let container
+  let likeHandler
+  let mockHandler
+
+  beforeEach(() => {
+    const blog = {
+      title: 'fake title',
+      author: 'emma',
+      url: 'www.google.com',
+      likes: '100',
+      user: {
+        name: 'avery'
+      }
+    }
+    likeHandler = vi.fn()
+    mockHandler = vi.fn()
+    container = render(<Blog blog={blog} setNotification={mockHandler} addLike={likeHandler}/>).container
+  })
+
+  test('clicking like twice calls mockHandler twice', async () => {
+    const user = userEvent.setup()
+    const viewButton = screen.getByText('view')
+    await user.click(viewButton)
+    const likeButton = screen.getByText('like')
+    await user.click(likeButton)
+    await user.click(likeButton)
+
+    expect(likeHandler.mock.calls).toHaveLength(2)
+  })
+})
