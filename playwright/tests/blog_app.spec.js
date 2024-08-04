@@ -1,4 +1,5 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
+const { loginWith, createBlog, loginDummy } = require('./helper')
 
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
@@ -24,25 +25,52 @@ describe('Blog app', () => {
 
   describe('Login', () => {
     test('succeeds with correct credentials', async ({ page }) => {
-      // fill correct credentials
-      await page.getByTestId('username').fill('janed')
-      await page.getByTestId('password').fill('test123')
-
-      // click login
-      await page.getByRole('button', { name: 'login' }).click()
-
+      await loginWith(page, 'janed', 'test123')
       // check results
       await expect(page.getByText('Jane Doe logged in')).toBeVisible()
     })
 
     test('fails with wrong credentials', async ({ page }) => {
-      await page.getByTestId('username').fill('janed')
-      await page.getByTestId('password').fill('wrong')
-
-      await page.getByRole('button', { name: 'login' }).click()
-
+      await loginWith(page, 'janed', 'wrong')
       const errorDiv = await page.locator('.error')
       await expect(errorDiv).toContainText('wrong username or password')
+    })
+  })
+
+  describe('When logged in', () => {
+    beforeEach(async ({ page }) => {
+      await loginWith(page, 'janed', 'test123')
+    })
+
+    test('a new blog can be created', async ({ page }) => {
+      await loginWith(page, 'janed', 'test123')
+      await createBlog(page, 'hubspot', 'avery g', 'www.test.com')
+      await expect(page.getByText('hubspot by avery g added')).toBeVisible()
+    })
+
+    describe ('and a new blog exists', () => {
+      beforeEach(async ({ page }) => {
+        await createBlog(page, 'hubspot', 'avery g', 'www.test.com')
+      })
+
+      test('blog can be liked', async ({ page }) => {
+        await page.getByRole('button', { name: 'view' }).click()
+        await page.getByRole('button', { name: 'like' }).click()
+        await expect(page.getByText('Likes: 1')).toBeVisible()
+      })
+
+      test('blog can be deleted by user', async ({ page }) => {
+        await page.getByRole('button', { name: 'view' }).click()
+        page.on('dialog', dialog => dialog.accept())
+        await page.getByRole('button', { name: 'delete' }).click()
+        await expect(page.getByText('hubspot avery g')).toHaveCount(0)
+      })
+
+      test('delete button not visible for unauthorized user', async ({ page, request }) => {
+        await loginDummy(page, request)
+        await page.getByRole('button', { name: 'view' }).click()
+        await expect(page.getByRole('button', { name: 'delete' })).toHaveCount(0)
+      })
     })
   })
 })
