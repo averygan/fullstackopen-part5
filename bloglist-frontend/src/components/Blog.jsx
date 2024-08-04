@@ -64,7 +64,7 @@ const Blog = ({ blog, setNotification, setError, blogState, setBlogs, addLike, l
         <div>Likes: {blog.likes} <button onClick={() => addLike(blog)}>like</button></div>
         <div>User: {blog.user.name}</div>
         <div>
-          {loggedInUser && (
+          {blog.user.username === loggedInUser?.username && (
             <button onClick={() => deleteBlog(blog)}>
             delete
             </button>

@@ -23,6 +23,5 @@ describe('blogForm component', () => {
     expect(createBlog.mock.calls[0][0].title).toBe('dummy title')
     expect(createBlog.mock.calls[0][0].author).toBe('harrow')
     expect(createBlog.mock.calls[0][0].url).toBe('www.ninth.com')
-
   })
 })
